@@ -66,6 +66,7 @@ def load_models():
         efficientnet.load_weights(os.path.join(MODEL_FOLDER, "efficientnet_weights.h5"))
 
         print("Models Loaded Successfully")
+load_models()
 # =============================
 # LANGUAGE FILES
 # =============================
@@ -146,14 +147,19 @@ def is_low_light(img):
 # ENSEMBLE PREDICTION (STABILIZED)
 # =============================
 def ensemble_predict(img):
-    load_models()
+    cnn_pred = cnn.predict(img, verbose=0)[0]
+    vgg_pred = vgg.predict(img, verbose=0)[0]
+    resnet_pred = resnet.predict(img, verbose=0)[0]
+    mobilenet_pred = mobilenet.predict(img, verbose=0)[0]
+    efficient_pred = efficientnet.predict(img, verbose=0)[0]
+
     preds = np.mean([
-        cnn.predict(img, verbose=0),
-        vgg.predict(img, verbose=0),
-        resnet.predict(img, verbose=0),
-        mobilenet.predict(img, verbose=0),
-        efficientnet.predict(img, verbose=0)
-    ], axis=0)[0]
+        cnn_pred,
+        vgg_pred,
+        resnet_pred,
+        mobilenet_pred,
+        efficient_pred
+    ], axis=0)
 
     preds = preds / np.sum(preds)
 
@@ -161,11 +167,11 @@ def ensemble_predict(img):
     confidence = round(float(preds[idx] * 100), 2)
 
     model_votes = {
-        "CNN": CLASS_NAMES[np.argmax(cnn.predict(img)[0])],
-        "VGG16": CLASS_NAMES[np.argmax(vgg.predict(img)[0])],
-        "ResNet50": CLASS_NAMES[np.argmax(resnet.predict(img)[0])],
-        "MobileNet": CLASS_NAMES[np.argmax(mobilenet.predict(img)[0])],
-        "EfficientNet": CLASS_NAMES[np.argmax(efficientnet.predict(img)[0])]
+        "CNN": CLASS_NAMES[np.argmax(cnn_pred)],
+        "VGG16": CLASS_NAMES[np.argmax(vgg_pred)],
+        "ResNet50": CLASS_NAMES[np.argmax(resnet_pred)],
+        "MobileNet": CLASS_NAMES[np.argmax(mobilenet_pred)],
+        "EfficientNet": CLASS_NAMES[np.argmax(efficient_pred)]
     }
 
     prob_table = {
@@ -175,9 +181,6 @@ def ensemble_predict(img):
 
     return CLASS_NAMES[idx], confidence, model_votes, prob_table
 def predict_deficiency_full_frame(img):
-
-    load_models()
-
     img = cv2.resize(img, (224, 224))
     img = img / 255.0
     img = np.expand_dims(img, axis=0)
