@@ -8,13 +8,10 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
-from flask import jsonify
 from tensorflow.keras.applications import EfficientNetB0
 from tensorflow.keras.layers import GlobalAveragePooling2D, BatchNormalization, Dropout, Dense
 from tensorflow.keras.models import Model
-from tensorflow.keras.models import load_model
-import numpy as np
-import cv2
+CLASS_NAMES = ["Normal", "Vitamin A", "Vitamin B", "Vitamin C", "Vitamin D"]
 # =============================
 # APP CONFIG
 # =============================
@@ -145,27 +142,6 @@ def is_blurry(img):
 def is_low_light(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     return np.mean(gray) < 40
-cnn = None
-vgg = None
-resnet = None
-mobilenet = None
-efficientnet = None
-
-def load_models():
-    global cnn, vgg, resnet, mobilenet, efficientnet
-
-    if cnn is None:
-        print("Loading models...")
-
-        cnn = load_model("models/cnn_model.h5")
-        vgg = load_model("models/vgg16_model.h5")
-        resnet = load_model("models/resnet50_model.h5")
-        mobilenet = load_model("models/mobilenet_model.h5")
-
-        efficientnet = build_efficientnet()
-        efficientnet.load_weights("models/efficientnet_weights.h5")
-
-        print("Models loaded successfully")
 # =============================
 # ENSEMBLE PREDICTION (STABILIZED)
 # =============================
@@ -199,12 +175,13 @@ def ensemble_predict(img):
 
     return CLASS_NAMES[idx], confidence, model_votes, prob_table
 def predict_deficiency_full_frame(img):
+
     load_models()
+
     img = cv2.resize(img, (224, 224))
     img = img / 255.0
     img = np.expand_dims(img, axis=0)
 
-    # ⭐ Use trained models correctly
     probs = []
 
     probs.append(cnn.predict(img, verbose=0)[0])
@@ -391,6 +368,9 @@ def live_predict():
         "probabilities": probabilities,
         "diet": DIET_MAP.get(deficiency)
     })
+@app.route("/health")
+def health():
+    return "OK"
 # =============================
 # MAIN ROUTE
 # =============================
@@ -480,5 +460,5 @@ def index():
     # ✅ ALWAYS RENDER (GET + POST)
     return render_template("index.html", **data)
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
+    port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
