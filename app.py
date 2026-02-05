@@ -48,15 +48,27 @@ def build_efficientnet():
 # LOAD MODELS
 # =============================
 MODEL_FOLDER = os.path.join(BASE_DIR, "models")
+cnn = None
+vgg = None
+resnet = None
+mobilenet = None
+efficientnet = None
 
-cnn = load_model(os.path.join(MODEL_FOLDER, "cnn_model.h5"))
-vgg = load_model(os.path.join(MODEL_FOLDER, "vgg16_model.h5"))
-resnet = load_model(os.path.join(MODEL_FOLDER, "resnet50_model.h5"))
-mobilenet = load_model(os.path.join(MODEL_FOLDER, "mobilenet_model.h5"))
-efficientnet = build_efficientnet()
-efficientnet.load_weights(os.path.join(MODEL_FOLDER, "efficientnet_weights.h5"))
-CLASS_NAMES = ["Normal", "Vitamin A", "Vitamin B", "Vitamin C", "Vitamin D"]
+def load_models():
+    global cnn, vgg, resnet, mobilenet, efficientnet
 
+    if cnn is None:
+        print("Loading models...")
+
+        cnn = load_model(os.path.join(MODEL_FOLDER, "cnn_model.h5"))
+        vgg = load_model(os.path.join(MODEL_FOLDER, "vgg16_model.h5"))
+        resnet = load_model(os.path.join(MODEL_FOLDER, "resnet50_model.h5"))
+        mobilenet = load_model(os.path.join(MODEL_FOLDER, "mobilenet_model.h5"))
+
+        efficientnet = build_efficientnet()
+        efficientnet.load_weights(os.path.join(MODEL_FOLDER, "efficientnet_weights.h5"))
+
+        print("Models Loaded Successfully")
 # =============================
 # LANGUAGE FILES
 # =============================
@@ -133,12 +145,32 @@ def is_blurry(img):
 def is_low_light(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     return np.mean(gray) < 40
+cnn = None
+vgg = None
+resnet = None
+mobilenet = None
+efficientnet = None
 
+def load_models():
+    global cnn, vgg, resnet, mobilenet, efficientnet
+
+    if cnn is None:
+        print("Loading models...")
+
+        cnn = load_model("models/cnn_model.h5")
+        vgg = load_model("models/vgg16_model.h5")
+        resnet = load_model("models/resnet50_model.h5")
+        mobilenet = load_model("models/mobilenet_model.h5")
+
+        efficientnet = build_efficientnet()
+        efficientnet.load_weights("models/efficientnet_weights.h5")
+
+        print("Models loaded successfully")
 # =============================
 # ENSEMBLE PREDICTION (STABILIZED)
 # =============================
 def ensemble_predict(img):
-
+    load_models()
     preds = np.mean([
         cnn.predict(img, verbose=0),
         vgg.predict(img, verbose=0),
@@ -167,7 +199,7 @@ def ensemble_predict(img):
 
     return CLASS_NAMES[idx], confidence, model_votes, prob_table
 def predict_deficiency_full_frame(img):
-
+    load_models()
     img = cv2.resize(img, (224, 224))
     img = img / 255.0
     img = np.expand_dims(img, axis=0)
