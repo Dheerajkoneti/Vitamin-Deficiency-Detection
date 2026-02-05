@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vitamin AI | Ensemble Diagnostic Suite</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+<style>
+:root{
+    --primary:#6366f1;
+    --accent:#00d2ff;
+    --success:#10b981;
+    --danger:#ef4444;
+    --glass:rgba(15,23,42,.85);
+}
+
+body{
+    font-family:Inter,system-ui;
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:
+        linear-gradient(rgba(0,0,0,.85),rgba(0,0,0,.95)),
+        url("https://images.unsplash.com/photo-1551288049-bebda4e38f71");
+    background-size:cover;
+    color:white;
+    padding:20px;
+}
+
+.dashboard{
+    display:grid;
+    grid-template-columns:320px 1fr 360px;
+    gap:20px;
+    max-width:1500px;
+    width:100%;
+    height:880px;
+}
+
+.panel{
+    background:var(--glass);
+    border-radius:26px;
+    padding:22px;
+    display:flex;
+    flex-direction:column;
+    overflow-y:auto;
+    box-shadow:0 20px 50px rgba(0,0,0,.6);
+}
+
+h2,h4{
+    margin:0 0 15px 0;
+    background:linear-gradient(to right,#fff,var(--accent));
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    text-transform:uppercase;
+    font-weight:800;
+}
+
+label{
+    font-size:11px;
+    color:#94a3b8;
+    font-weight:700;
+    margin-bottom:6px;
+    display:block;
+}
+
+select,input[type=file]{
+    width:100%;
+    padding:10px;
+    background:rgba(0,0,0,.4);
+    border:1px solid rgba(255,255,255,.2);
+    border-radius:10px;
+    color:white;
+}
+
+.group{
+    background:rgba(255,255,255,.04);
+    padding:16px;
+    border-radius:16px;
+    margin-bottom:15px;
+}
+
+.btn{
+    padding:14px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(45deg,var(--primary),var(--accent));
+    color:white;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.img-box{
+    position:relative;
+    flex:1;
+    border-radius:20px;
+    overflow:hidden;
+    border:2px solid rgba(255,255,255,.1);
+    background:black;
+}
+
+.img-box img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+}
+
+.scan-line{
+    position:absolute;
+    top:0;
+    width:100%;
+    height:3px;
+    background:var(--accent);
+    animation:scan 4s infinite;
+}
+
+@keyframes scan{
+    0%{top:0}
+    50%{top:100%}
+    100%{top:0}
+}
+
+.result{
+    background:rgba(16,185,129,.15);
+    border:1px solid var(--success);
+    padding:16px;
+    border-radius:18px;
+    text-align:center;
+    margin-bottom:15px;
+}
+
+.chip{
+    display:inline-block;
+    padding:5px 10px;
+    background:rgba(255,255,255,.05);
+    border-radius:8px;
+    font-size:11px;
+    margin:4px;
+    color:var(--accent);
+}
+
+.bar{
+    height:6px;
+    background:rgba(255,255,255,.1);
+    border-radius:5px;
+    overflow:hidden;
+    margin-bottom:10px;
+}
+
+.fill{
+    height:100%;
+    background:var(--primary);
+}
+
+.doctor{
+    background:linear-gradient(135deg,rgba(99,102,241,.1),rgba(0,210,255,.1));
+    border-radius:18px;
+    padding:15px;
+    margin-top:15px;
+}
+
+.doc-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.avatar{
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    background:var(--primary);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:20px;
+    position:relative;
+}
+
+.online{
+    width:10px;
+    height:10px;
+    background:var(--success);
+    border-radius:50%;
+    position:absolute;
+    bottom:0;
+    right:0;
+}
+
+.contact{
+    padding:8px 14px;
+    background:var(--accent);
+    color:black;
+    border-radius:10px;
+    font-size:11px;
+    font-weight:800;
+    text-decoration:none;
+}
+
+.download{
+    margin-top:15px;
+    padding:12px;
+    border:1px solid var(--accent);
+    color:var(--accent);
+    text-align:center;
+    border-radius:12px;
+    text-decoration:none;
+}
+.prob-row{
+    margin:12px 0;
+    padding:8px;
+    border-radius:10px;
+    background:rgba(255,255,255,0.03);
+}
+
+.prob-bar{
+    width:100%;
+    height:8px;
+    background:#2e3c4f;
+    border-radius:6px;
+    overflow:hidden;
+    margin:4px 0;
+}
+.prob-fill{
+    height:100%;
+    border-radius:6px;
+    width:0%;
+    transition: width 0.8s ease, background 0.5s ease;
+}
+
+/* HIGH CONFIDENCE */
+.prob-high{
+    background:linear-gradient(90deg,#10b981,#34d399);
+}
+
+/* MEDIUM CONFIDENCE */
+.prob-medium{
+    background:linear-gradient(90deg,#f59e0b,#fbbf24);
+}
+
+/* LOW CONFIDENCE */
+.prob-low{
+    background:linear-gradient(90deg,#ef4444,#f87171);
+}
+</style>
+</head>
+
+<body>
+<div class="dashboard">
+
+<!-- LEFT -->
+<div class="panel">
+<h2>Parameters</h2>
+<form method="POST" enctype="multipart/form-data">
+  <input type="hidden" name="language" value="{{ selected_lang }}">
+  <div class="group">
+    <label>{{ texts.upload_image }}</label>
+    <input type="file" name="image" required>
+  </div>
+
+  <button class="btn">{{ texts.initiate_scan }}</button>
+</form>
+<button type="button"
+        class="btn"
+        style="margin-top:20px"
+        onclick="startLive()">
+🎥 Live Detection
+</button>
+
+<div id="liveBox" style="display:none;margin-top:15px;text-align:center;">
+
+    <!-- Hidden video source -->
+    <div style="position:relative;width:320px;height:240px;margin:auto;">
+  <video id="video" width="320" height="240" autoplay muted></video>
+  <canvas id="liveCanvas"
+          width="320"
+          height="240"
+          style="position:absolute;top:0;left:0;">
+  </canvas>
+</div>
+    <br><br>
+
+    <button class="btn" onclick="captureFrame()">📸 Analyze</button>
+    <button class="btn" style="background:#ef4444" onclick="stopLive()">❌ Stop</button>
+
+</div>
+<div id="liveResult" class="result" style="display:none;margin-top:12px;">
+
+    <h4>Live Prediction</h4>
+
+    <!-- MAIN DEFICIENCY RESULT -->
+    <div id="liveResultText"></div>
+
+    <!-- DIET RESULT -->
+    <div id="liveDiet" style="margin-top:10px;"></div>
+
+    <!-- PROBABILITY DISPLAY -->
+    <h4 style="margin-top:15px;">Probability</h4>
+    <div id="liveProbabilities"></div>
+
+</div>
+
+{% if warnings %}
+<div style="margin-top:15px;border-left:3px solid var(--danger);padding-left:12px;">
+  <h4 style="-webkit-text-fill-color:var(--danger)">Quality Alerts</h4>
+  {% for w in warnings %}
+    <p style="font-size:11px">• {{ w }}</p>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if diet_info %}
+<div class="doctor">
+    <h4>🥗 Dietary Recommendations</h4>
+    <ul style="font-size:12px; line-height:1.6; padding-left:16px;">
+        {% for food in diet_info.foods %}
+        <li>{{ food }}</li>
+        {% endfor %}
+    </ul>
+    <p style="font-size:11px; opacity:0.8;">{{ diet_info.advice }}</p>
+    <p style="font-size:10px; opacity:0.6;">⚠ Not a medical prescription</p>
+</div>
+{% endif %}
+</div>
+<!-- CENTER -->
+<div class="panel">
+{% if image_path %}
+<div class="img-box">
+<div class="scan-line"></div>
+<img src="{{ url_for('static', filename='uploads/' ~ image_path) }}">
+</div>
+
+{% if heatmap_path %}
+<div class="img-box" style="margin-top:15px">
+<img src="{{ url_for('static', filename='heatmaps/' ~ heatmap_path) }}">
+</div>
+{% endif %}
+{% else %}
+<div style="margin:auto;opacity:.3;text-align:center">
+<i class="fas fa-brain fa-4x"></i>
+<p>Awaiting input…</p>
+</div>
+{% endif %}
+</div>
+
+<!-- RIGHT -->
+<div class="panel">
+{% if prediction %}
+
+<div class="result">
+<div style="font-size:11px">FINAL DIAGNOSIS</div>
+<h2>{{ prediction }}</h2>
+<p>{{ confidence }}% Confidence</p>
+</div>
+
+<h4>Explainable AI</h4>
+<p style="font-size:12px">{{ ai_explanation }}</p>
+
+<h4>Ensemble Votes</h4>
+{% for m,v in model_votes.items() %}
+<span class="chip">{{ m }} → {{ v }}</span>
+{% endfor %}
+
+<h4 style="margin-top:15px">Probability</h4>
+
+{% for c,v in prob_table.items() %}
+
+<div style="margin-bottom:12px">
+
+    <!-- Label Row -->
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        font-size:13px;
+        font-weight:600;
+        margin-bottom:4px;
+    ">
+        <span>{{ c }}</span>
+        <span>{{ "%.2f"|format(v) }}%</span>
+    </div>
+
+    <!-- Progress Bar -->
+    <div style="
+        height:8px;
+        background:rgba(255,255,255,.1);
+        border-radius:8px;
+        overflow:hidden;
+    ">
+        <div style="
+            width:{{ v }}%;
+            height:100%;
+            background:linear-gradient(90deg,#00d2ff,#6366f1);
+            transition:0.6s ease;
+        ">
+        </div>
+    </div>
+
+</div>
+
+{% endfor %}
+
+{% if doctor_info %}
+<div class="doctor">
+<h4>Specialist</h4>
+<p style="font-size:12px">{{ doctor_info.description }}</p>
+<div class="doc-row">
+<div class="avatar">
+<i class="fas fa-user-md"></i>
+{% if doctor_info.availability=="Online" %}<div class="online"></div>{% endif %}
+</div>
+<div style="flex:1">
+<b>{{ doctor_info.doctor_name }}</b><br>
+<span style="font-size:11px">{{ doctor_info.specialist }}</span>
+</div>
+<a href="{{ doctor_info.contact_link }}" class="contact">CONTACT</a>
+</div>
+</div>
+{% endif %}
+
+{% if report_path %}
+<a class="download"
+href="{{ url_for('static', filename='reports/' ~ report_path) }}"
+download>
+DOWNLOAD MEDICAL REPORT
+</a>
+{% endif %}
+
+{% else %}
+<p style="margin:auto;opacity:.3;text-align:center">
+Submit scan to view diagnosis
+</p>
+{% endif %}
+</div>
+<!-- LIVE CAMERA MODAL -->
+<div id="liveModal" style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.75);
+z-index:999;
+">
+
+    <div style="
+        width:420px;
+        background:#0f172a;
+        margin:6% auto;
+        padding:20px;
+        border-radius:20px;
+        text-align:center;
+        box-shadow:0 20px 60px rgba(0,0,0,.6);
+    ">
+
+    </div>
+</div>
+
+<script>
+let stream = null;
+let ctx = null;
+let video = null;
+let animationId = null;
+
+// ===============================
+// START LIVE CAMERA
+// ===============================
+function startLive(){
+
+    document.getElementById("liveBox").style.display = "block";
+
+    video = document.getElementById("video");
+    const canvas = document.getElementById("liveCanvas");
+    ctx = canvas.getContext("2d");
+
+    if(animationId){
+        cancelAnimationFrame(animationId);
+    }
+
+    navigator.mediaDevices.getUserMedia({ video:true })
+    .then(s => {
+
+        stream = s;
+        video.srcObject = s;
+        video.play();
+
+        function draw(){
+
+            if(video.readyState === 4){
+                ctx.drawImage(video,0,0,canvas.width,canvas.height);
+            }
+
+            animationId = requestAnimationFrame(draw);
+        }
+
+        draw();
+
+    })
+    .catch(err => alert("Camera Error : " + err));
+}
+
+// ===============================
+// STOP LIVE CAMERA
+// ===============================
+function stopLive(){
+
+    if(animationId){
+        cancelAnimationFrame(animationId);
+    }
+
+    if(stream){
+        stream.getTracks().forEach(track => track.stop());
+    }
+
+    stream = null;
+
+    document.getElementById("liveBox").style.display = "none";
+}
+
+// ===============================
+// CAPTURE FRAME + FREEZE IMAGE
+// ===============================
+function captureFrame(){
+
+    if(!stream || !video || video.videoWidth === 0){
+        alert("Camera not ready");
+        return;
+    }
+
+    const canvas = document.getElementById("liveCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // ⭐ Freeze frame
+    ctx.drawImage(video,0,0,canvas.width,canvas.height);
+
+    // ⭐ Stop animation loop
+    if(animationId){
+        cancelAnimationFrame(animationId);
+    }
+
+    canvas.toBlob(blob => {
+
+        if(!blob){
+            alert("Frame capture failed");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("frame",blob,"frame.jpg");
+
+        fetch("/live_predict",{
+            method:"POST",
+            body:formData
+        })
+        .then(res => res.json())
+        .then(result => {
+
+            console.log("LIVE RESULT:",result);
+
+            if(result.error){
+                alert(result.error);
+                return;
+            }
+
+            showLiveResults(result);
+            drawPredictions(result);
+
+        })
+        .catch(err => console.error(err));
+
+    },"image/jpeg");
+}
+
+// ===============================
+// DISPLAY LIVE RESULTS
+// ===============================
+function showLiveResults(result){
+
+    document.getElementById("liveResult").style.display = "block";
+
+    // MAIN RESULT
+    document.getElementById("liveResultText").innerHTML =
+        `🧪 Deficiency: <b>${result.deficiency}</b> (${result.confidence}%)`;
+
+    // DIET
+    if(result.diet){
+        document.getElementById("liveDiet").innerHTML =
+            `🥗 Diet: ${result.diet.foods.join(", ")}<br>${result.diet.advice}`;
+    }
+
+    // ===============================
+    // PROBABILITY BARS
+    // ===============================
+    let probHTML = "";
+
+    for(let vitamin in result.probabilities){
+
+        let value = result.probabilities[vitamin];
+
+        let colorClass = "prob-low";
+
+        if(value >= 70){
+            colorClass = "prob-high";
+        }
+        else if(value >= 40){
+            colorClass = "prob-medium";
+        }
+
+        probHTML += `
+            <div class="prob-row">
+
+                <div style="display:flex;justify-content:space-between;font-size:12px">
+                    <span>${vitamin}</span>
+                    <span>${value}%</span>
+                </div>
+
+                <div class="prob-bar">
+                    <div class="prob-fill ${colorClass}" data-width="${value}%"></div>
+                </div>
+
+            </div>
+        `;
+    }
+
+    document.getElementById("liveProbabilities").innerHTML = probHTML;
+
+    // ⭐ Animate bars
+    setTimeout(()=>{
+        document.querySelectorAll(".prob-fill").forEach(bar=>{
+            bar.style.width = bar.dataset.width;
+        });
+    },100);
+}
+
+// ===============================
+// DRAW OVERLAY TEXT
+// ===============================
+function drawPredictions(data){
+
+    ctx.fillStyle = "#00ffcc";
+    ctx.font = "16px Arial";
+
+    if(data.deficiency){
+        ctx.fillText(
+            `Deficiency: ${data.deficiency} (${data.confidence}%)`,
+            10,
+            20
+        );
+    }
+}
+</script>
+<script>
+heatmap_full_path = os.path.join(HEATMAP_FOLDER, str(heatmap_path))
+</script>
+</body>
+</html>

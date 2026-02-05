@@ -1,0 +1,12 @@
+{
+  "language": "భాష",
+  "body_part": "శరీర భాగం",
+  "upload_image": "చిత్రాన్ని అప్లోడ్ చేయండి",
+  "initiate_scan": "స్కాన్ ప్రారంభించండి",
+  "live_detection": "లైవ్ గుర్తింపు",
+  "analyze": "విశ్లేషించండి",
+  "stop": "ఆపండి",
+  "awaiting": "ఇన్‌పుట్ కోసం వేచి ఉంది…",
+  "live_prediction": "లైవ్ ఫలితం",
+  "confidence": "నమ్మకం"
+}

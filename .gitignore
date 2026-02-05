@@ -1,0 +1,11 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.h5
+*.log
+.env
+static/uploads/
+static/heatmaps/
+static/reports/

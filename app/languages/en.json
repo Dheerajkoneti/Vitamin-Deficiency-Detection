@@ -1,0 +1,12 @@
+{
+  "language": "Language",
+  "body_part": "Body Part",
+  "upload_image": "Upload Image",
+  "initiate_scan": "INITIATE SCAN",
+  "live_detection": "Live Detection",
+  "analyze": "Analyze",
+  "stop": "Stop",
+  "awaiting": "Awaiting input…",
+  "live_prediction": "Live Prediction",
+  "confidence": "Confidence"
+}
