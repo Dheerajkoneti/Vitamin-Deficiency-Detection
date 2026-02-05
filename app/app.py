@@ -47,12 +47,14 @@ def build_efficientnet():
 # =============================
 # LOAD MODELS
 # =============================
-cnn = load_model("../models/cnn_model.h5")
-vgg = load_model("../models/vgg16_model.h5")
-resnet = load_model("../models/resnet50_model.h5")
-mobilenet = load_model("../models/mobilenet_model.h5")
+MODEL_FOLDER = os.path.join(BASE_DIR, "models")
+
+cnn = load_model(os.path.join(MODEL_FOLDER, "cnn_model.h5"))
+vgg = load_model(os.path.join(MODEL_FOLDER, "vgg16_model.h5"))
+resnet = load_model(os.path.join(MODEL_FOLDER, "resnet50_model.h5"))
+mobilenet = load_model(os.path.join(MODEL_FOLDER, "mobilenet_model.h5"))
 efficientnet = build_efficientnet()
-efficientnet.load_weights("../models/efficientnet_weights.h5")
+efficientnet.load_weights(os.path.join(MODEL_FOLDER, "efficientnet_weights.h5"))
 CLASS_NAMES = ["Normal", "Vitamin A", "Vitamin B", "Vitamin C", "Vitamin D"]
 
 # =============================
@@ -446,9 +448,5 @@ def index():
     # ✅ ALWAYS RENDER (GET + POST)
     return render_template("index.html", **data)
 if __name__ == "__main__":
-    app.run(
-        host="127.0.0.1",
-        port=5000,
-        debug=True,
-        use_reloader=False
-    )
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
