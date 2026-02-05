@@ -1,0 +1,7 @@
+{
+    "title": "Vitamin Deficiency Detection",
+    "upload": "Upload Image",
+    "result": "Prediction Result",
+    "confidence": "Confidence",
+    "diet": "Recommended Diet"
+}
