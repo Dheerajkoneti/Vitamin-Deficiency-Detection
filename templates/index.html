@@ -83,16 +83,25 @@ select,input[type=file]{
     margin-bottom:15px;
 }
 
-.btn{
+.btn {
+    width:100%;
     padding:14px;
-    border:none;
     border-radius:14px;
-    background:linear-gradient(45deg,var(--primary),var(--accent));
+    border:none;
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:0.5px;
     color:white;
-    font-weight:800;
     cursor:pointer;
+    background:linear-gradient(135deg,#00d2ff,#6366f1);
+    transition:all .3s ease;
+    box-shadow:0 8px 25px rgba(0,210,255,.3);
 }
 
+.btn:hover {
+    transform:translateY(-2px);
+    box-shadow:0 12px 30px rgba(0,210,255,.5);
+}
 .img-box{
     position:relative;
     flex:1;
@@ -255,13 +264,19 @@ select,input[type=file]{
 <div class="panel">
 <h2>Parameters</h2>
 <form method="POST" enctype="multipart/form-data">
-  <input type="hidden" name="language" value="{{ selected_lang }}">
-  <div class="group">
-    <label>{{ texts.upload_image }}</label>
-    <input type="file" name="image" required>
-  </div>
+    
+    <input type="hidden" name="language" value="{{ selected_lang }}">
 
-  <button class="btn">{{ texts.initiate_scan }}</button>
+    <div class="group">
+        <label>{{ texts.upload_image }}</label>
+        <input type="file" name="image" required>
+    </div>
+
+    <!-- ✅ ANALYZE BUTTON INSIDE FORM -->
+    <button type="submit" class="btn">
+       ANALYSE 🔍 {{ texts.initiate_scan }}
+    </button>
+
 </form>
 <button type="button"
         class="btn"
@@ -648,9 +663,6 @@ function drawPredictions(data){
         );
     }
 }
-</script>
-<script>
-heatmap_full_path = os.path.join(HEATMAP_FOLDER, str(heatmap_path))
 </script>
 </body>
 </html>
